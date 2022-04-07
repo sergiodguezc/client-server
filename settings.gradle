@@ -8,5 +8,5 @@
  */
 
 rootProject.name = 'client-server'
-include('client')
 include('server')
+include('client')

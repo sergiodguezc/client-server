@@ -1,40 +1,27 @@
 package client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class Client {
-
-    public static void main(String[] args) {
+    public static void main (String args[]) {
         try {
-            // Leer nombre de usuario. Lo leemos de args[0]
-            if (args.length != 2) {
-                System.out.println("need 2 arguments.");
-                System.exit(1);;
-            }
-            String host = args[0];
-            String filename = args[1];
+            Socket socket = new Socket(args[0], 9999);
+            ObjectOutputStream to_server = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream from_server = new ObjectInputStream(socket.getInputStream());
 
-            // Abrimos un socket, la entrada y salida leen y escriben sobre él.
-            Socket socket = new Socket(host, 9999);
-            BufferedReader from_server = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter to_server = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+            String msg = (String)from_server.readObject();
+            to_server.writeObject("adios"); to_server.flush();
 
-            to_server.println(filename); to_server.flush();
-
-            String line;
-            while ((line = from_server.readLine()) != null) {
-                System.out.println(line);
-            }
+            System.out.println("Cliente: Recibo hola del servidor");
+            System.out.println("Mensaje: " + msg);
+            System.out.println("Cliente: Escribo adios al servidor");
             socket.close();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 

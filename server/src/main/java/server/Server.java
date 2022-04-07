@@ -1,49 +1,34 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    public static void main(String[] args) {
+    public static void main(String args[]) {
         try {
-			ServerSocket listen = new ServerSocket(9999);
-
+            ServerSocket listen = new ServerSocket(9999);
             while(true) {
-                System.out.println("Waiting for connection...");
                 Socket socket = listen.accept();
+                ObjectOutputStream to_client = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream from_client = new ObjectInputStream(socket.getInputStream());
 
-                BufferedReader from_client = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                PrintWriter to_client = new PrintWriter(socket.getOutputStream());
+                to_client.writeObject("Hola"); to_client.flush();
+                String msg = (String) from_client.readObject();
 
-                // Get filename from client and checks if it exists
-                String filename = from_client.readLine();
-                File inputFile = new File(filename);
-                if (!inputFile.exists()) {
-                    to_client.println("cannot open " + filename);
-                    to_client.close(); from_client.close();
-                    socket.close();
-                    continue;
-                }
+                System.out.println("Servidor: Escribo hola al cliente ");
+                System.out.println("Servidor: Recibo adios del cliente");
+                System.out.println("Mensaje: " + msg);
 
-                // read lines from filename and send to client
-                System.out.println("reading from file "+ filename);
-                BufferedReader input = new BufferedReader(new FileReader(inputFile));
-                String line;
-
-                while ((line = input.readLine()) != null)
-                    to_client.println(line);
-                to_client.close(); from_client.close();
                 socket.close();
+                listen.close();
             }
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
