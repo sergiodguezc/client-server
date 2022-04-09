@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class OS extends Thread {
     private String host;
@@ -19,11 +20,10 @@ public class OS extends Thread {
             ObjectOutputStream fout = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream fin = new ObjectInputStream(socket.getInputStream());
 
-            // Send filename to server, then read and print lines
-            // Until server closes the connection
+            // Send filename to server, then read the file
             fout.writeObject(filename); fout.flush();
-            String line;
-            while((line = (String) fin.readObject()) != null) {
+            ArrayList<String> msg = (ArrayList<String>) fin.readObject();
+            for (String line : msg) {
                 System.out.println(line);
             }
 

@@ -1,12 +1,9 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OC extends Thread {
     private Socket socket;
@@ -31,11 +28,18 @@ public class OC extends Thread {
             else {
                 System.out.println("reading from file " + filename);
                 BufferedReader input = new BufferedReader(new FileReader(inputFile));
-                String line;
+
+                // Read file into a list of messages. Deliver this list to client
+                String line; ArrayList<String> msg = new ArrayList<String>();
                 while((line = input.readLine()) != null) {
-                    fout.writeObject(line); fout.flush();
+                    msg.add(line);
                 }
-                fout.close(); fin.close();
+                fout.writeObject(msg);
+                fout.flush();
+
+                // Close the piper
+                fout.close();
+                fin.close();
                 socket.close();
             }
         } catch (IOException e) {
