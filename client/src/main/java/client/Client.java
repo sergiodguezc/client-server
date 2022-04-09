@@ -6,24 +6,23 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class Client {
-    public static void main (String args[]) {
+    public Client() {
+    }
+
+    public static void main(String[] args) {
         try {
-            Socket socket = new Socket(args[0], 9999);
-            ObjectOutputStream to_server = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream from_server = new ObjectInputStream(socket.getInputStream());
+            // Read command line arguments
+            String host = args[0];
+            String filename = args[1];
 
-            String msg = (String)from_server.readObject();
-            to_server.writeObject("adios"); to_server.flush();
+            // New thread for the communication with the server
+            OS os = new OS(host, filename);
+            os.start();
 
-            System.out.println("Cliente: Recibo hola del servidor");
-            System.out.println("Mensaje: " + msg);
-            System.out.println("Cliente: Escribo adios al servidor");
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+            // Wait for the communication to close
+            os.join();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 }
