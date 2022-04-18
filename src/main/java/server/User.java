@@ -21,5 +21,9 @@ public class User {
         this.fout = fout;
         this.lista = lista;
     }
+
+	public String getUsername() {
+		return username;
+	}
     
 }
