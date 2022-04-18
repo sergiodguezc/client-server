@@ -3,7 +3,21 @@ package msg;
 import java.io.Serializable;
 
 public abstract class Message implements Serializable {
+    private String src;
+    private String dest;
+
+    public Message(String src, String dest) {
+        this.src = src;
+        this.dest = dest;
+    }
+
     public abstract KindM getType();
-    public abstract String getSrc();
-    public abstract String getDest();
+
+    public String getSrc() {
+        return src;
+    }
+
+    public String getDest() {
+        return dest;
+    }
 }
