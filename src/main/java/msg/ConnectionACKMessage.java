@@ -2,8 +2,8 @@ package msg;
 
 public class ConnectionACKMessage extends Message {
 
-	public ConnectionACKMessage(String src, String dest) {
-		super(src, dest);
+	public ConnectionACKMessage(String dest) {
+		super("server", dest);
 	}
 
 	public KindM getType() {
