@@ -4,7 +4,15 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
+import javax.swing.JFrame;
+
+import lock.LockBakery;
+
+public class Server extends JFrame {
+    // Puerto asignado es un atributo que usaremos en las conexiones p2p
+    // y que lo protegeremos con con un LockBakery, implementado en la práctica
+    // 2.
+    private LockBakery lock;
 
     // Necesitamos dos tablas que almacenan la informacion del
     // sistema que se accederan de manera concurrente mediante
@@ -30,6 +38,9 @@ public class Server {
     // se puede seguir accediendo.
 
     public Server() {
+        id_user = new UserTable();
+        id_lista = new DataMonitor();
+        lock = new LockBakery(0);
     }
 
     public static void main(String[] args) {

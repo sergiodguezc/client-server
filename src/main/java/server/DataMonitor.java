@@ -2,7 +2,6 @@ package server;
 
 import data.Data;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -20,7 +19,6 @@ public class DataMonitor {
     // y valor = archivo
 
     private HashMap<String, Data> id_file;
-    // TODO: preguntar si usar nuestros locks o los de java
     private Lock lock;
     private volatile int nr, nw;
     private Condition oktoread, oktowrite;
@@ -33,9 +31,9 @@ public class DataMonitor {
     }
 
     // Lectura de toda la tabla
-    public HashMap<String,Data> getAll() {
+    public HashMap<String, Data> getAll() {
         requestRead();
-        HashMap<String,Data> t = id_file;
+        HashMap<String, Data> t = id_file;
         releaseRead();
         return t;
     }
@@ -49,17 +47,31 @@ public class DataMonitor {
     }
 
     // Escritura de un elemento de la tabla
-    // Pueden ocurrir dos cosas: 
+    // Pueden ocurrir dos cosas:
     // - No existe un Data, se crea una nueva entrada
-    // - Existe Data, se añade un nuevo user a la lista de usuarios del data
-    public void add(User u, Data d) {
+    // - Existe Data, se añade un nuevo user al conjunto de usuarios del data
+    public void add(String filename, User u) {
+        requestWrite();
+        if (!id_file.containsKey(filename)) {
+            id_file.put(filename, new Data(u, filename));
+        } else {
+            id_file.get(filename).addUser(u);
+        }
+        releaseWrite();
     }
-    
+
     // Escritura de un elemento de la tabla
-    // Pueden ocurrir dos cosas: 
-    // - La lista queda vacía, se elimina la entrada
-    // - Sigue habiendo elementos en la lista, se elimina solo el usuario de la lista
-    public void delete(User u, Data d) {
+    // Pueden ocurrir dos cosas:
+    // - El conjunto queda vacía, se elimina la entrada
+    // - Sigue habiendo elementos en el conjunto, se elimina solo el usuario del
+    // conjunto
+    public void delete(String filename, User u) {
+        requestWrite();
+        id_file.get(filename).deleteUser(u);
+        if (id_file.get(filename).isEmpty()) {
+            id_file.remove(filename);
+        }
+        releaseWrite();
     }
 
     // Métodos privados que encapsulan la lectura y escritura
