@@ -9,4 +9,8 @@ public class ConnectionACKMessage extends Message {
 	public KindM getType() {
         return KindM.CONNECTIONACK;
 	}
+
+	public String toString() {
+		return "ConnectionACKMessage{" + getSrc() + "," + getDest() + "}";
+	}
 }

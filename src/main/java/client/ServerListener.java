@@ -24,9 +24,8 @@ public class ServerListener extends Thread {
                 Message msg = (Message) fin.readObject();
                 switch (msg.getType()) {
                     case CONNECTIONACK:
-                        System.out.println(msg);
-                        break;
                     case USERLISTACK:
+                        // Mostramos la informacion devuelta por el server
                         System.out.println(msg);
                         break;
                     case SERVERCLIENTREADY:
@@ -40,9 +39,9 @@ public class ServerListener extends Thread {
                         break;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
     }

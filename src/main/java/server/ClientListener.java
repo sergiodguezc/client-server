@@ -8,17 +8,23 @@ import msg.UserListMessage;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 public class ClientListener extends Thread {
     private Socket socket;
     private ObjectOutputStream fout;
     private ObjectInputStream fin;
+    private DataMonitor id_lista;
+    private UserTable id_user;
 
-    public ClientListener(Socket socket) {
+    public ClientListener(Socket socket, Server server) {
         try {
             this.socket = socket;
             fout = new ObjectOutputStream(socket.getOutputStream());
             fin = new ObjectInputStream(socket.getInputStream());
+            this.id_lista = server.getId_lista();
+            this.id_user = server.getId_user();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,13 +38,18 @@ public class ClientListener extends Thread {
                 switch (msg.getType()) {
                     case CONNECTION:
                         // Guarda informacion del usuario en la tabla
+                        User u = new User(socket.getLocalAddress().getHostAddress(), msg.getSrc(), fout, fin);
+                        id_user.add(u);
                         // Envio mensaje-confirmacion-conexion por fout
                         fout.writeObject(new ConnectionACKMessage(msg.getSrc()));
                         fout.flush();
                         break;
                     case USERLIST:
                         // Crea un mensaje con la informacion global
+                        HashMap<String, Set<String>> inf_global = id_lista.getAll();
                         // Envio mensaje confirmacion lista usuarios
+                        fout.writeObject(new UserListACKMessage(msg.getSrc(), inf_global));
+                        fout.flush();
                         break;
                     case CLOSE:
                         // Eliminar informacion de las tablas
@@ -57,9 +68,9 @@ public class ClientListener extends Thread {
                         break;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
     }

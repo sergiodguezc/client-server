@@ -2,6 +2,7 @@ package client;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -11,6 +12,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import msg.ConnectionMessage;
+import msg.UserListMessage;
 
 public class Client extends JFrame implements ActionListener {
     private Socket socket;
@@ -54,7 +56,7 @@ public class Client extends JFrame implements ActionListener {
                 fout = new ObjectOutputStream(socket.getOutputStream());
                 fin = new ObjectInputStream(socket.getInputStream());
                 new ServerListener(socket, fin, fout).start();
-                fout.writeObject(new ConnectionMessage(ip, username));
+                fout.writeObject(new ConnectionMessage(username, "server"));
                 fout.flush();
 
                 // Cambio de menu
@@ -67,6 +69,12 @@ public class Client extends JFrame implements ActionListener {
                 exc.printStackTrace();
             }
         } else if (e.getSource() == panelMenu.getButtonUserList()) {
+            try {
+                fout.writeObject(new UserListMessage(username));
+                fout.flush();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
 
         } else if (e.getSource() == panelMenu.getButtonExit()) {
             System.exit(0);

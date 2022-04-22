@@ -62,6 +62,8 @@ public class UserTable {
         return u;
     }
 
+    // TODO : Hacer vista global de la tabla
+
     // Escritor que añade un elemento
     public void add(User u) {
         try {

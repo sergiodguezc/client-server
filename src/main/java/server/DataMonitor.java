@@ -2,7 +2,9 @@ package server;
 
 import data.Data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -31,9 +33,10 @@ public class DataMonitor {
     }
 
     // Lectura de toda la tabla
-    public HashMap<String, Data> getAll() {
+    public HashMap<String, Set<String>> getAll() {
         requestRead();
-        HashMap<String, Data> t = id_file;
+        // Creamos una nueva vista de la tabla
+        HashMap<String, Set<String>> t = cloneTable();
         releaseRead();
         return t;
     }
@@ -50,7 +53,7 @@ public class DataMonitor {
     // Pueden ocurrir dos cosas:
     // - No existe un Data, se crea una nueva entrada
     // - Existe Data, se añade un nuevo user al conjunto de usuarios del data
-    public void add(String filename, User u) {
+    public void add(String filename, String u) {
         requestWrite();
         if (!id_file.containsKey(filename)) {
             id_file.put(filename, new Data(u, filename));
@@ -65,7 +68,7 @@ public class DataMonitor {
     // - El conjunto queda vacía, se elimina la entrada
     // - Sigue habiendo elementos en el conjunto, se elimina solo el usuario del
     // conjunto
-    public void delete(String filename, User u) {
+    public void delete(String filename, String u) {
         requestWrite();
         id_file.get(filename).deleteUser(u);
         if (id_file.get(filename).isEmpty()) {
@@ -113,5 +116,14 @@ public class DataMonitor {
         oktowrite.signal(); // despierta un escritor
         oktoread.signalAll(); // despierta todos los lectores
         lock.unlock();
+    }
+
+    // Necesitamos una vista en deep copy de la tabla
+    private HashMap<String, Set<String>> cloneTable() {
+        HashMap<String, Set<String>> view = new HashMap<>();
+        for(String name : id_file.keySet()) {
+            view.put(new String(name), id_file.get(name).clone());
+        }
+        return view;
     }
 }

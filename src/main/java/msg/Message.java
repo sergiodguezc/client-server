@@ -13,6 +13,8 @@ public abstract class Message implements Serializable {
 
     public abstract KindM getType();
 
+    public String toString() {return "";};
+
     public String getSrc() {
         return src;
     }
