@@ -2,6 +2,7 @@ package msg;
 
 import data.Data;
 import server.DataMonitor;
+import server.User;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -9,11 +10,11 @@ import java.util.Set;
 public class UserListACKMessage extends Message {
 
 	// Informacion global que se pasa como mensaje
-	private HashMap<String, Set<String>> id_lista;
+	private HashMap<String, User> id_user;
 
-	public UserListACKMessage(String dest, HashMap<String, Set<String>> id_lista) {
+	public UserListACKMessage(String dest, HashMap<String, User> id_user) {
 		super("server", dest);
-		this.id_lista = id_lista;
+		this.id_user = id_user;
 	}
 
 	public KindM getType() {
@@ -21,6 +22,6 @@ public class UserListACKMessage extends Message {
 	}
 
 	public String toString() {
-		return "UserListACK{" + id_lista.toString() + "}";
+		return "UserListACK{" + id_user.toString() + "}";
 	}
 }

@@ -10,17 +10,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class ClientInitPanel extends JPanel {
-    private JTextField textIp = new JTextField(20);
-    private JTextField textUsername = new JTextField(20);
-    private JLabel labelUsername = new JLabel("Enter username: ");
-    private JLabel labelIp = new JLabel("Enter ip: ");
+public class ClientDownloadPanel extends JPanel {
+    private JTextField textfilename = new JTextField(20);
+    private JLabel labelfile = new JLabel("Enter file name: ");
     private JButton button = new JButton("OK");
 
-	private GridBagConstraints constraints;
+    private GridBagConstraints constraints;
     private Client cliente;
 
-    public ClientInitPanel(Client cliente) {
+    public ClientDownloadPanel(Client cliente) {
         super(new GridBagLayout());
 
         constraints = new GridBagConstraints();
@@ -30,20 +28,13 @@ public class ClientInitPanel extends JPanel {
         // add components to the panelInicio
         constraints.gridx = 0;
         constraints.gridy = 0;
-        this.add(labelUsername, constraints);
+        this.add(labelfile, constraints);
 
         constraints.gridx = 1;
-        this.add(textUsername, constraints);
+        this.add(textfilename, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 1;
-        this.add(labelIp, constraints);
-
-        constraints.gridx = 1;
-        this.add(textIp, constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy = 2;
         constraints.gridwidth = 2;
         constraints.anchor = GridBagConstraints.CENTER;
         button.addActionListener(cliente);
@@ -54,15 +45,11 @@ public class ClientInitPanel extends JPanel {
                 BorderFactory.createEtchedBorder(), "Client app"));
     }
 
-    public JTextField getTextIp() {
-		return textIp;
-	}
+    public JTextField getTextfilename() {
+        return textfilename;
+    }
 
-	public JTextField getTextUsername() {
-		return textUsername;
-	}
-
-	public JButton getButton() {
-		return button;
-	}
+    public JButton getButton() {
+        return button;
+    }
 }

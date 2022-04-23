@@ -46,4 +46,8 @@ public class Data implements Cloneable{
         }
         return view;
     }
+
+    public String getUser() {
+        return (String) users.toArray()[0];
+    }
 }

@@ -62,7 +62,38 @@ public class UserTable {
         return u;
     }
 
-    // TODO : Hacer vista global de la tabla
+    public HashMap<String,User> getAll() {
+        HashMap<String,User> view = null;
+        try {
+            e.acquire();
+            if (nw > 0) {
+                dr = dr + 1;
+                e.release();
+                r.acquire();
+            }
+            nr = nr + 1;
+            if (dr > 0) {
+                dr = dr - 1;
+                r.release();
+            } else
+                e.release();
+
+            // COPIA
+            view = clone();
+
+            e.acquire();
+            nr = nr - 1;
+            if (nr == 0 && dw > 0) {
+                dw = dw - 1;
+                w.release();
+            } else
+                e.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return view;
+    }
+
 
     // Escritor que añade un elemento
     public void add(User u) {
@@ -95,7 +126,7 @@ public class UserTable {
     }
 
     // Escritor que elimina un elemento
-    public void delete(User u) {
+    public void delete(String u) {
         try {
             e.acquire();
             if (nr > 0 || nw > 0) {
@@ -107,7 +138,7 @@ public class UserTable {
             e.release();
 
             // WRITE
-            id_user.put(u.getUsername(), u);
+            id_user.remove(u);
 
             e.acquire();
             nw = nw - 1;
@@ -122,5 +153,13 @@ public class UserTable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    // Obtener copia de la tabla
+    public HashMap<String, User> clone() {
+        HashMap<String,User> view = new HashMap<>();
+        for(String username : id_user.keySet())
+            view.put(new String(username), id_user.get(username).clone());
+        return view;
     }
 }

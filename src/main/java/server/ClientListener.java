@@ -1,9 +1,6 @@
 package server;
 
-import msg.ConnectionACKMessage;
-import msg.Message;
-import msg.UserListACKMessage;
-import msg.UserListMessage;
+import msg.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -46,23 +43,49 @@ public class ClientListener extends Thread {
                         break;
                     case USERLIST:
                         // Crea un mensaje con la informacion global
-                        HashMap<String, Set<String>> inf_global = id_lista.getAll();
+                        HashMap<String, User> copia_id_user = id_user.getAll();
                         // Envio mensaje confirmacion lista usuarios
-                        fout.writeObject(new UserListACKMessage(msg.getSrc(), inf_global));
+                        fout.writeObject(new UserListACKMessage(msg.getSrc(), copia_id_user));
                         fout.flush();
                         break;
                     case CLOSE:
+                        // TODO: Comprobar que esta correcto
                         // Eliminar informacion de las tablas
+                        User to_delete = id_user.get(msg.getSrc());
+                        // Modificamos las entradas de id_lista donde
+                        // el usuario tiene un archivo
+                        for(String file : to_delete.getDescargas())
+                            id_lista.delete(file,to_delete.getUsername());
+                        // Eliminamos la entrada asociada a este usuario
+                        id_user.delete(msg.getSrc());
+
                         // Envio mensaje confirmacion cerrar conexion
-                        break;
+                        fout.writeObject(new CloseACKMessage(msg.getSrc()));
+                        fout.flush();
+
+                        // Terminamos el proceso
+                        socket.close();
+                        return;
                     case FILEREQUEST:
                         // Buscar el usuario que tiene el archivo en las tablas
                         // y su flujo fout2
+                        String name_sender = id_lista.get(msg.getFile()).getUser();
+                        User sender = id_user.get(name_sender);
+                        ObjectOutputStream fout2 = sender.getFout();
+
                         // Enviar mensaje emitir fichero por fout2
+                        // El receptor de la comunicacion es el msg.getSrc()
+                        fout2.writeObject(new SendFileMessage(name_sender, msg.getSrc(), msg.getFile()));
+                        fout2.flush();
                         break;
                     case CLIENTSERVERREADY:
                         // Buscar el fout1 del cliente 1 que pidio el fichero
+                        String name_receiver = msg.getReceiver();
+                        User receiver = id_user.get(name_receiver);
+                        ObjectOutputStream fout1 = receiver.getFout();
+
                         // Envio de mensaje preparado de servidor-cliente.
+                        fout1.writeObject(new ServerClientReadyMessage(name_receiver,port_sender));
                     default:
                         System.err.println("ERROR: MENSAJE NO RECONOCIDO.");
                         break;

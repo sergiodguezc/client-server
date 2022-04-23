@@ -11,17 +11,21 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import msg.CloseMessage;
 import msg.ConnectionMessage;
+import msg.FileRequestMessage;
 import msg.UserListMessage;
 
 public class Client extends JFrame implements ActionListener {
     private Socket socket;
     private ObjectInputStream fin;
     private ObjectOutputStream fout;
+    private ServerListener OS;
 
     // Menu atributes
     private ClientInitPanel panelInicio;
     private ClientMenuPanel panelMenu;
+    private ClientDownloadPanel panelDownload;
     protected String ip;
     protected String username;
 
@@ -46,8 +50,8 @@ public class Client extends JFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == panelInicio.getButton()) {
-            try {
+        try {
+            if (e.getSource() == panelInicio.getButton()) {
                 ip = panelInicio.getTextIp().getText();
                 username = panelInicio.getTextUsername().getText();
                 
@@ -55,7 +59,10 @@ public class Client extends JFrame implements ActionListener {
                 socket = new Socket(ip, 9999);
                 fout = new ObjectOutputStream(socket.getOutputStream());
                 fin = new ObjectInputStream(socket.getInputStream());
-                new ServerListener(socket, fin, fout).start();
+
+                // Creamos un proceso que reciba los mensajes del servidor
+                OS = new ServerListener(socket, fin, fout);
+                OS.start();
                 fout.writeObject(new ConnectionMessage(username, "server"));
                 fout.flush();
 
@@ -65,19 +72,34 @@ public class Client extends JFrame implements ActionListener {
                 revalidate();
                 repaint();
 
-            } catch (Exception exc) {
-                exc.printStackTrace();
-            }
-        } else if (e.getSource() == panelMenu.getButtonUserList()) {
-            try {
+            } else if (e.getSource() == panelMenu.getButtonUserList()) {
                 fout.writeObject(new UserListMessage(username));
                 fout.flush();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
 
-        } else if (e.getSource() == panelMenu.getButtonExit()) {
-            System.exit(0);
+            } else if (e.getSource() == panelMenu.getButtonExit()) {
+                fout.writeObject(new CloseMessage(username));
+                fout.flush();
+                OS.join();
+                System.exit(0);
+
+            } else if (e.getSource() == panelMenu.getButtonDownload()) {
+                // Cambio de panel
+                remove(panelMenu);
+                add(panelDownload);
+                revalidate();
+                repaint();
+            } else if(e.getSource() == panelDownload.getButton()) {
+                String file = panelDownload.getTextfilename().getText();
+                fout.writeObject(new FileRequestMessage(username, file));
+                fout.flush();
+
+                remove(panelDownload);
+                add(panelMenu);
+                revalidate();
+                repaint();
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
         }
     }
 
@@ -93,6 +115,7 @@ public class Client extends JFrame implements ActionListener {
         // panel menu
         panelMenu = new ClientMenuPanel(this);
 
+        panelDownload = new ClientDownloadPanel(this);
 
         pack();
         setLocationRelativeTo(null);

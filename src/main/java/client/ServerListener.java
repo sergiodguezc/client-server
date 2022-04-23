@@ -21,18 +21,23 @@ public class ServerListener extends Thread {
     public void run() {
         while (true) {
             try {
-                Message msg = (Message) fin.readObject();
+                Object obj = fin.readObject();
+                Message msg = (Message) obj;
                 switch (msg.getType()) {
                     case CONNECTIONACK:
                     case USERLISTACK:
                         // Mostramos la informacion devuelta por el server
                         System.out.println(msg);
                         break;
+                    case CLOSEACK:
+                        System.out.println(msg);
+                        socket.close();
+                        return;
                     case SERVERCLIENTREADY:
-                        // (new Receiver()).start();
+                        (new Receiver()).start();
                         break;
                     case SENDFILE:
-                        // (new Sender()).start();
+                        (new Sender()).start();
                         break;
                     default:
                         System.err.println("ERROR: MENSAJE NO RECONOCIDO.");

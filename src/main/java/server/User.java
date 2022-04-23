@@ -1,14 +1,12 @@
 package server;
 
-import data.Data;
-
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class User implements Cloneable {
+public class User implements Cloneable, Serializable {
 
     private final String ip;
     private final String username;
@@ -21,6 +19,15 @@ public class User implements Cloneable {
         this.username = username;
         this.fin = fin;
         this.fout = fout;
+        this.descargas = new HashSet<>();
+    }
+
+    // Constructor para la copia de la tabla id_user, necesitamos objetos serializables
+    public User(String ip, String username) {
+        this.ip = ip;
+        this.username = username;
+        fin = null;
+        fout = null;
         this.descargas = new HashSet<>();
     }
 
@@ -37,13 +44,28 @@ public class User implements Cloneable {
     }
 
     public User clone() {
-        User user = null;
-        try {
-            user = new User(new String(ip), new String(username), new ObjectOutputStream(fout), new ObjectInputStream(fin));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        User user = new User(new String(ip), new String(username));
+
+        for(String files : descargas)
+            user.addData(new String(files));
+
         return user;
     }
-    
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "ip='" + ip + '\'' +
+                ", username='" + username + '\'' +
+                ", descargas=" + descargas +
+                '}';
+    }
+
+    public Set<String> getDescargas() {
+        return descargas;
+    }
+
+    public ObjectOutputStream getFout() {
+        return fout;
+    }
 }

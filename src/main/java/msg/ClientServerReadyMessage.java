@@ -2,8 +2,10 @@ package msg;
 
 public class ClientServerReadyMessage extends Message {
 
-	public ClientServerReadyMessage(String src, String dest) {
-		super(src, dest);
+	private String receiver;
+	public ClientServerReadyMessage(String src, String receiver) {
+		super(src, "server");
+		this.receiver = receiver;
 	}
 
 	public KindM getType() {
