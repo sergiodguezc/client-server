@@ -29,9 +29,9 @@ public class Receiver extends Thread {
     // Nombre del receptor
     private String username;
 
-    public Receiver(String username, ObjectOutputStream fout_server, ObjectInputStream fin_server, HashMap<String, File> name_file) {
+    public Receiver(String username, ObjectOutputStream fout_server, ObjectInputStream fin_server, HashMap<String, File> name_file, int port_sender) {
         try {
-            socket = new Socket("localhost",0);
+            socket = new Socket("localhost",port_sender);
             fout_p2p = new ObjectOutputStream(socket.getOutputStream());
             fin_p2p = new ObjectInputStream(socket.getInputStream());
             this.fout_server = fout_server;

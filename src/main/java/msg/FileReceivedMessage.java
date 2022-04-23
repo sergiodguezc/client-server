@@ -6,6 +6,7 @@ public class FileReceivedMessage extends Message {
 
     public FileReceivedMessage(String src, String file) {
         super(src, "server");
+        this.file = file;
     }
 
     public KindM getType() {

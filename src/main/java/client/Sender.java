@@ -51,6 +51,8 @@ public class Sender extends Thread {
 
             // Esperamos a que se conecte el receptor
             socket = ss.accept();
+            fout_p2p = new ObjectOutputStream(socket.getOutputStream());
+            fin_p2p = new ObjectInputStream(socket.getInputStream());
 
             // Cuando el receptor está conectado le pasamos la información
             fout_p2p.writeObject(fichero);

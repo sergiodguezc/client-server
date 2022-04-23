@@ -40,7 +40,7 @@ public class ServerListener extends Thread {
                         socket.close();
                         return;
                     case SERVERCLIENTREADY:
-                        (new Receiver(msg.getDest(), fout, fin, name_file)).start();
+                        (new Receiver(msg.getDest(), fout, fin, name_file, msg.getPort())).start();
                         break;
                     case SENDFILE:
                         (new Sender(fout, fin, msg.getDest(), msg.getReceiver(), name_file.get(msg.getFile()))).start();

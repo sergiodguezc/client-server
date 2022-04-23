@@ -97,10 +97,16 @@ public class ClientListener extends Thread {
                         // Envio de mensaje preparado de servidor-cliente.
                         int port_sender = msg.getPort();
                         fout1.writeObject(new ServerClientReadyMessage(name_receiver,port_sender));
+                        break;
                     case FILERECEIVED:
                         // Modificar la tabla id_lista, añadiendo al receptor como
                         // nuevo usuario que tiene ese fichero
                         id_lista.add(msg.getFile(), msg.getSrc());
+
+                        // Modificar la tabla id_user, añadiendo el file al usuario
+                        // que tiene ese fichero
+                        id_user.get(msg.getSrc()).addData(msg.getFile());
+                        break;
                     default:
                         System.err.println("ERROR: MENSAJE NO RECONOCIDO.");
                         break;

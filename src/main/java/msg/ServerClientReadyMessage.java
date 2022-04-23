@@ -6,6 +6,7 @@ public class ServerClientReadyMessage extends Message {
 
 	public ServerClientReadyMessage(String dest, int port) {
 		super("server", dest);
+		this.port = port;
 	}
 
 	public KindM getType() {
