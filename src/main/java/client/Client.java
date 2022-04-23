@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import javax.swing.*;
 
@@ -25,8 +27,6 @@ public class Client extends JFrame implements ActionListener {
     private ClientInitPanel panelInicio;
     private ClientMenuPanel panelMenu;
     private ClientDownloadPanel panelDownload;
-    //private ClientAddFilesPanel panelFiles;
-    private JFileChooser fileChooser;
     private String ip;
     private String username;
 
@@ -70,7 +70,10 @@ public class Client extends JFrame implements ActionListener {
                 // Creamos un proceso que reciba los mensajes del servidor
                 OS = new ServerListener(socket, fin, fout, name_files);
                 OS.start();
-                fout.writeObject(new ConnectionMessage(username, "server", name_files.keySet()));
+                ArrayList<String> filenames = new ArrayList<>();
+                for (String name : name_files.keySet())
+                    filenames.add(name);
+                fout.writeObject(new ConnectionMessage(username, "server", filenames));
                 fout.flush();
 
                 // Cambio de menu
@@ -105,9 +108,10 @@ public class Client extends JFrame implements ActionListener {
                 revalidate();
                 repaint();
             } else if (e.getSource() == panelInicio.getAddFilesButton()) {
-                int retval = fileChooser.showOpenDialog(this);
+                int retval = panelInicio.openDialog();
                 if (retval == JFileChooser.APPROVE_OPTION) {
-
+                    File f = panelInicio.getSelectedFile();
+                    name_files.put(f.getName(),f);
                 }
             }
         } catch (Exception exc) {
@@ -129,10 +133,6 @@ public class Client extends JFrame implements ActionListener {
 
         // panel download
         panelDownload = new ClientDownloadPanel(this);
-
-        // panel files
-        //panelFiles = new ClientAddFilesPanel(this);
-        fileChooser= new JFileChooser();
 
         pack();
         setLocationRelativeTo(null);

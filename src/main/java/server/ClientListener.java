@@ -35,12 +35,16 @@ public class ClientListener extends Thread {
 
                 switch (msg.getType()) {
                     case CONNECTION:
-                        // Guarda informacion del usuario en la tabla id_user
                         User u = new User(socket.getLocalAddress().getHostAddress(), msg.getSrc(), fout, fin);
-                        id_user.add(u);
+
                         // Guardamos los nuevos ficheros que tiene este usuario en id_lista
-                        for(String file : msg.getFiles())
+                        for(String file : msg.getFiles()) {
                             id_lista.add(file, u.getUsername());
+                            u.addData(file);
+                        }
+
+                        // Guarda informacion del usuario en la tabla id_user
+                        id_user.add(u);
                         // Envio mensaje-confirmacion-conexion por fout
                         fout.writeObject(new ConnectionACKMessage(msg.getSrc()));
                         fout.flush();

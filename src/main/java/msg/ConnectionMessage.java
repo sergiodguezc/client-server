@@ -1,13 +1,13 @@
 package msg;
 
-import java.util.Set;
+import java.util.ArrayList;
 
 public class ConnectionMessage extends Message {
 
 	// Ficheros que tiene disponible
-	private Set<String> files;
+	private ArrayList<String> files;
 
-	public ConnectionMessage(String src, String dest, Set<String> files) {
+	public ConnectionMessage(String src, String dest, ArrayList<String> files) {
 		super(src, dest);
 		this.files = files;
 	}
@@ -16,7 +16,7 @@ public class ConnectionMessage extends Message {
 		return KindM.CONNECTION;
 	}
 
-	public Set<String> getFiles() {
+	public ArrayList<String> getFiles() {
 		return files;
 	}
     

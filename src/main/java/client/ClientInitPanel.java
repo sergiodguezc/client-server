@@ -3,6 +3,7 @@ package client;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
 
 import javax.swing.*;
 
@@ -14,12 +15,16 @@ public class ClientInitPanel extends JPanel {
     private JButton okButton = new JButton("OK");
 
     private JButton addFilesButton = new JButton("Add Files");
+    private JFileChooser fileChooser = new JFileChooser();
 
 	private GridBagConstraints constraints;
     private Client cliente;
 
     public ClientInitPanel(Client cliente) {
         super(new GridBagLayout());
+
+        // Init filechooser
+        fileChooser = new JFileChooser();
 
         constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.WEST;
@@ -44,6 +49,7 @@ public class ClientInitPanel extends JPanel {
         constraints.gridy = 2;
         constraints.gridwidth = 2;
         constraints.anchor = GridBagConstraints.CENTER;
+        addFilesButton.addActionListener(cliente);
         this.add(addFilesButton, constraints);
 
         constraints.gridx = 0;
@@ -72,5 +78,16 @@ public class ClientInitPanel extends JPanel {
     }
     public JButton getAddFilesButton() {
         return addFilesButton;
+    }
+
+    public int openDialog() {
+        return fileChooser.showOpenDialog(this);
+    }
+
+    public File[] getSelectedFiles(){
+        return fileChooser.getSelectedFiles();
+    }
+    public File getSelectedFile(){
+        return fileChooser.getSelectedFile();
     }
 }

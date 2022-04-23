@@ -1,7 +1,7 @@
 package msg;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.ArrayList;
 
 public abstract class Message implements Serializable {
     private String src;
@@ -35,7 +35,7 @@ public abstract class Message implements Serializable {
         return 0;
     }
 
-    public Set<String> getFiles() {
+    public ArrayList<String> getFiles() {
         return null;
     }
 }
