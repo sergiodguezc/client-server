@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-// Receiver hace la funcio de server en la conexion p2p
+// Receiver hace la funcion de server en la conexion p2p
 public class Receiver extends Thread {
     // Socket para la comunicacion p2p
     private Socket socket;
@@ -25,6 +25,6 @@ public class Receiver extends Thread {
     }
 
     public void run() {
-
+        // TODO
     }
 }

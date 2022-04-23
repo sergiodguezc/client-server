@@ -29,4 +29,8 @@ public abstract class Message implements Serializable {
     public String getDest() {
         return dest;
     }
+
+    public int getPort() {
+        return 0;
+    }
 }

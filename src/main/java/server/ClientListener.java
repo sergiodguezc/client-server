@@ -85,6 +85,7 @@ public class ClientListener extends Thread {
                         ObjectOutputStream fout1 = receiver.getFout();
 
                         // Envio de mensaje preparado de servidor-cliente.
+                        int port_sender = msg.getPort();
                         fout1.writeObject(new ServerClientReadyMessage(name_receiver,port_sender));
                     default:
                         System.err.println("ERROR: MENSAJE NO RECONOCIDO.");

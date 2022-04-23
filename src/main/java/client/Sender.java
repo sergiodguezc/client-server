@@ -37,17 +37,19 @@ public class Sender extends Thread {
 
     public void run() {
         try {
-            // Enviamos el mensaje al servidor de que esta preparado
-            fout_server.writeObject(new ClientServerReadyMessage(sender, receiver));
-            fout_server.flush();
-
             // Abrimos un nuevo puerto para empezar la comunicacion con el receptor
             ss = new ServerSocket(0);
+
+            // Enviamos el mensaje al servidor de que esta preparado
+            fout_server.writeObject(new ClientServerReadyMessage(sender, receiver, ss.getLocalPort()));
+            fout_server.flush();
+
+            // Esperamos a que se conecte el receptor
             socket = ss.accept();
+
+            // TODO : Terminar la comunicacion p2p
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    public
 }

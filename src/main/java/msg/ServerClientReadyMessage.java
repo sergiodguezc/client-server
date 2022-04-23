@@ -2,7 +2,9 @@ package msg;
 
 public class ServerClientReadyMessage extends Message {
 
-	public ServerClientReadyMessage(String dest) {
+	private int port;
+
+	public ServerClientReadyMessage(String dest, int port) {
 		super("server", dest);
 	}
 
@@ -10,4 +12,7 @@ public class ServerClientReadyMessage extends Message {
 		return KindM.SERVERCLIENTREADY;
 	}
 
+	public int getPort() {
+		return port;
+	}
 }
