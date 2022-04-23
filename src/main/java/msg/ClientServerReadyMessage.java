@@ -18,4 +18,8 @@ public class ClientServerReadyMessage extends Message {
 	public int getPort() {
 		return port;
 	}
+	
+	public String getReceiver() {
+		return receiver;
+	}
 }

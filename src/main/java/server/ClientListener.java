@@ -79,7 +79,7 @@ public class ClientListener extends Thread {
                     case FILEREQUEST:
                         // Buscar el usuario que tiene el archivo en las tablas
                         // y su flujo fout2
-                        String name_sender = id_lista.get(msg.getFile()).getUser();
+                        String name_sender = (String) id_lista.get(msg.getFile()).toArray()[0];
                         User sender = id_user.get(name_sender);
                         ObjectOutputStream fout2 = sender.getFout();
 

@@ -1,10 +1,7 @@
 package server;
 
-import data.Data;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -18,9 +15,9 @@ public class DataMonitor {
 
     // Utilizamos como estructura de datos una tabla Hash
     // con clave = identificador del archivo
-    // y valor = archivo
+    // y valor = conjunto de usuarios con el archivo
 
-    private HashMap<String, Data> id_file;
+    private HashMap<String, HashSet<String>> id_file;
     private Lock lock;
     private volatile int nr, nw;
     private Condition oktoread, oktowrite;
@@ -32,21 +29,12 @@ public class DataMonitor {
         oktowrite = lock.newCondition();
     }
 
-    // Lectura de toda la tabla
-    public HashMap<String, Set<String>> getAll() {
-        requestRead();
-        // Creamos una nueva vista de la tabla
-        HashMap<String, Set<String>> t = cloneTable();
-        releaseRead();
-        return t;
-    }
-
     // Lectura de un elemento de la tabla
-    public Data get(String id) {
+    public HashSet<String> get(String id) {
         requestRead();
-        Data d = id_file.get(id);
+        HashSet<String> users = id_file.get(id);
         releaseRead();
-        return d;
+        return users;
     }
 
     // Escritura de un elemento de la tabla
@@ -56,9 +44,11 @@ public class DataMonitor {
     public void add(String filename, String u) {
         requestWrite();
         if (!id_file.containsKey(filename)) {
-            id_file.put(filename, new Data(u, filename));
+            HashSet<String> users = new HashSet<>();
+            users.add(u);
+            id_file.put(filename, users);
         } else {
-            id_file.get(filename).addUser(u);
+            id_file.get(filename).add(u);
         }
         releaseWrite();
     }
@@ -70,7 +60,7 @@ public class DataMonitor {
     // conjunto
     public void delete(String filename, String u) {
         requestWrite();
-        id_file.get(filename).deleteUser(u);
+        id_file.get(filename).remove(u);
         if (id_file.get(filename).isEmpty()) {
             id_file.remove(filename);
         }
@@ -116,14 +106,5 @@ public class DataMonitor {
         oktowrite.signal(); // despierta un escritor
         oktoread.signalAll(); // despierta todos los lectores
         lock.unlock();
-    }
-
-    // Necesitamos una vista en deep copy de la tabla
-    private HashMap<String, Set<String>> cloneTable() {
-        HashMap<String, Set<String>> view = new HashMap<>();
-        for(String name : id_file.keySet()) {
-            view.put(new String(name), id_file.get(name).clone());
-        }
-        return view;
     }
 }

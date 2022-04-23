@@ -10,6 +10,7 @@ public class SendFileMessage extends Message {
 	public SendFileMessage(String dest, String receiver, String file) {
 		super("server", dest);
 		this.file = file;
+		this.receiver = receiver;
 	}
 
 	public KindM getType() {

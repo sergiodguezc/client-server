@@ -43,7 +43,7 @@ public class ServerListener extends Thread {
                         (new Receiver(msg.getDest(), fout, fin, name_file)).start();
                         break;
                     case SENDFILE:
-                        (new Sender(fout, fin, msg.getDest(), msg.getReceiver(), msg.getFile())).start();
+                        (new Sender(fout, fin, msg.getDest(), msg.getReceiver(), name_file.get(msg.getFile()))).start();
                         break;
                     default:
                         System.err.println("ERROR: MENSAJE NO RECONOCIDO.");

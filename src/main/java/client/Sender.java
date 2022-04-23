@@ -32,12 +32,12 @@ public class Sender extends Thread {
     // Fichero que envía
     private File fichero;
 
-    public Sender(ObjectOutputStream fout_server, ObjectInputStream fin_server, String sender, String receiver, String file) {
+    public Sender(ObjectOutputStream fout_server, ObjectInputStream fin_server, String sender, String receiver, File file) {
         this.fout_server = fout_server;
         this.fin_server = fin_server;
         this.sender = sender;
         this.receiver = receiver;
-        this.fichero = new File(file);
+        this.fichero = file;
     }
 
     public void run() {

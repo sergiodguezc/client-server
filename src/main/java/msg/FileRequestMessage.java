@@ -5,6 +5,7 @@ public class FileRequestMessage extends Message {
 
 	public FileRequestMessage(String src, String file) {
 		super(src, "server");
+		this.file = file;
 	}
 
 	public KindM getType() {
