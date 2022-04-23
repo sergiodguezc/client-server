@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ClientListener extends Thread {
@@ -34,9 +35,12 @@ public class ClientListener extends Thread {
 
                 switch (msg.getType()) {
                     case CONNECTION:
-                        // Guarda informacion del usuario en la tabla
+                        // Guarda informacion del usuario en la tabla id_user
                         User u = new User(socket.getLocalAddress().getHostAddress(), msg.getSrc(), fout, fin);
                         id_user.add(u);
+                        // Guardamos los nuevos ficheros que tiene este usuario en id_lista
+                        for(String file : msg.getFiles())
+                            id_lista.add(file, u.getUsername());
                         // Envio mensaje-confirmacion-conexion por fout
                         fout.writeObject(new ConnectionACKMessage(msg.getSrc()));
                         fout.flush();
@@ -64,6 +68,8 @@ public class ClientListener extends Thread {
                         fout.flush();
 
                         // Terminamos el proceso
+                        fout.close();
+                        fin.close();
                         socket.close();
                         return;
                     case FILEREQUEST:
@@ -87,6 +93,10 @@ public class ClientListener extends Thread {
                         // Envio de mensaje preparado de servidor-cliente.
                         int port_sender = msg.getPort();
                         fout1.writeObject(new ServerClientReadyMessage(name_receiver,port_sender));
+                    case FILERECEIVED:
+                        // Modificar la tabla id_lista, añadiendo al receptor como
+                        // nuevo usuario que tiene ese fichero
+                        id_lista.add(msg.getFile(), msg.getSrc());
                     default:
                         System.err.println("ERROR: MENSAJE NO RECONOCIDO.");
                         break;

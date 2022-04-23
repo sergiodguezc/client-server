@@ -1,6 +1,7 @@
 package msg;
 
 import java.io.Serializable;
+import java.util.Set;
 
 public abstract class Message implements Serializable {
     private String src;
@@ -32,5 +33,9 @@ public abstract class Message implements Serializable {
 
     public int getPort() {
         return 0;
+    }
+
+    public Set<String> getFiles() {
+        return null;
     }
 }

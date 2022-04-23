@@ -16,15 +16,11 @@ public class Data implements Cloneable{
     public Data(String user, String filename) {
         users = new HashSet<>();
         users.add(user);
-        setFichero(new File(filename));
+        this.fichero = fichero;
     }
 
     public File getFichero() {
 		return fichero;
-	}
-
-	public void setFichero(File fichero) {
-		this.fichero = fichero;
 	}
 
 	public void addUser(String u) {

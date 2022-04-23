@@ -2,14 +2,13 @@ package client;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import msg.CloseMessage;
 import msg.ConnectionMessage;
@@ -26,12 +25,20 @@ public class Client extends JFrame implements ActionListener {
     private ClientInitPanel panelInicio;
     private ClientMenuPanel panelMenu;
     private ClientDownloadPanel panelDownload;
-    protected String ip;
-    protected String username;
+    //private ClientAddFilesPanel panelFiles;
+    private JFileChooser fileChooser;
+    private String ip;
+    private String username;
+
+    // Tabla para obtener el fichero solicitado por otro cliente
+    // Clave : Nombre que el servidor tiene asociado a este fichero
+    // Valor : File que tiene descargado el cliente con ese nombre
+    private HashMap<String,File> name_files;
 
 
     public Client() {
         super("Client app");
+        name_files = new HashMap<>();
         iniciarPanel();
     }
 
@@ -51,7 +58,7 @@ public class Client extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         try {
-            if (e.getSource() == panelInicio.getButton()) {
+            if (e.getSource() == panelInicio.getOkButton()) {
                 ip = panelInicio.getTextIp().getText();
                 username = panelInicio.getTextUsername().getText();
                 
@@ -61,9 +68,9 @@ public class Client extends JFrame implements ActionListener {
                 fin = new ObjectInputStream(socket.getInputStream());
 
                 // Creamos un proceso que reciba los mensajes del servidor
-                OS = new ServerListener(socket, fin, fout);
+                OS = new ServerListener(socket, fin, fout, name_files);
                 OS.start();
-                fout.writeObject(new ConnectionMessage(username, "server"));
+                fout.writeObject(new ConnectionMessage(username, "server", name_files.keySet()));
                 fout.flush();
 
                 // Cambio de menu
@@ -97,6 +104,11 @@ public class Client extends JFrame implements ActionListener {
                 add(panelMenu);
                 revalidate();
                 repaint();
+            } else if (e.getSource() == panelInicio.getAddFilesButton()) {
+                int retval = fileChooser.showOpenDialog(this);
+                if (retval == JFileChooser.APPROVE_OPTION) {
+
+                }
             }
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -115,7 +127,12 @@ public class Client extends JFrame implements ActionListener {
         // panel menu
         panelMenu = new ClientMenuPanel(this);
 
+        // panel download
         panelDownload = new ClientDownloadPanel(this);
+
+        // panel files
+        //panelFiles = new ClientAddFilesPanel(this);
+        fileChooser= new JFileChooser();
 
         pack();
         setLocationRelativeTo(null);

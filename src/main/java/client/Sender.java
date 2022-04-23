@@ -2,6 +2,7 @@ package client;
 
 import msg.ClientServerReadyMessage;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,11 +29,15 @@ public class Sender extends Thread {
     // Nombre del emisor
     private String sender;
 
-    public Sender(ObjectOutputStream fout_server, ObjectInputStream fin_server, String sender, String receiver) {
+    // Fichero que envía
+    private File fichero;
+
+    public Sender(ObjectOutputStream fout_server, ObjectInputStream fin_server, String sender, String receiver, String file) {
         this.fout_server = fout_server;
         this.fin_server = fin_server;
         this.sender = sender;
         this.receiver = receiver;
+        this.fichero = new File(file);
     }
 
     public void run() {
@@ -47,7 +52,15 @@ public class Sender extends Thread {
             // Esperamos a que se conecte el receptor
             socket = ss.accept();
 
-            // TODO : Terminar la comunicacion p2p
+            // Cuando el receptor está conectado le pasamos la información
+            fout_p2p.writeObject(fichero);
+            fout_p2p.flush();
+
+            // Terminamos la conexion p2p
+            fout_p2p.close();
+            fin_p2p.close();
+            socket.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

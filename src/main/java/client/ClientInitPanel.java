@@ -4,18 +4,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 public class ClientInitPanel extends JPanel {
     private JTextField textIp = new JTextField(20);
     private JTextField textUsername = new JTextField(20);
     private JLabel labelUsername = new JLabel("Enter username: ");
     private JLabel labelIp = new JLabel("Enter ip: ");
-    private JButton button = new JButton("OK");
+    private JButton okButton = new JButton("OK");
+
+    private JButton addFilesButton = new JButton("Add Files");
 
 	private GridBagConstraints constraints;
     private Client cliente;
@@ -46,8 +44,15 @@ public class ClientInitPanel extends JPanel {
         constraints.gridy = 2;
         constraints.gridwidth = 2;
         constraints.anchor = GridBagConstraints.CENTER;
-        button.addActionListener(cliente);
-        this.add(button, constraints);
+        this.add(addFilesButton, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        constraints.gridwidth = 2;
+        constraints.anchor = GridBagConstraints.CENTER;
+        okButton.addActionListener(cliente);
+        this.add(okButton, constraints);
+
 
         // set border for the panel
         this.setBorder(BorderFactory.createTitledBorder(
@@ -62,7 +67,10 @@ public class ClientInitPanel extends JPanel {
 		return textUsername;
 	}
 
-	public JButton getButton() {
-		return button;
-	}
+	public JButton getOkButton() {
+        return okButton;
+    }
+    public JButton getAddFilesButton() {
+        return addFilesButton;
+    }
 }

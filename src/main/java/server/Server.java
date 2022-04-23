@@ -3,12 +3,12 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+// TODO: Ver qué pasa con esto
 import lock.LockBakery;
 
 import javax.swing.JFrame;
 
 public class Server extends JFrame {
-
     // Necesitamos dos tablas que almacenan la informacion del
     // sistema que se accederan de manera concurrente mediante
     // el problema de lector-escritor.
