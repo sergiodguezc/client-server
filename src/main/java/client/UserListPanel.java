@@ -6,10 +6,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class UserListPanel extends JPanel {
-   JTable table = new JTable();
+   JTable table;
    JButton menuButton = new JButton("Menu");
 
     private GridBagConstraints constraints;
@@ -21,7 +20,7 @@ public class UserListPanel extends JPanel {
        constraints.anchor = GridBagConstraints.WEST;
        constraints.insets = new Insets(10, 10, 10, 10);
 
-       initTable(users);
+       table = new JTable(createTableModel(users));
 
        // add components to the panel
        constraints.gridx = 0;
@@ -43,12 +42,10 @@ public class UserListPanel extends JPanel {
     private DefaultTableModel createTableModel(ArrayList<User> users) {
        String[] columnNames = {"Username", "IP", "Files"};
        String[][] data = new String[users.size()][3];
-       for (String d : data) {
-           for (int i=0;i<3;i++) {
-               d[i][0] = users.get(i).getUsername();
-               d[i][1] = users.get(i).getIp();
-               d[i][2] = users.get(i).getDescargas();
-           }
+       for (int i = 0; i < users.size(); i++) {
+               data[i][0] = users.get(i).getUsername();
+               data[i][1] = users.get(i).getIp();
+               data[i][2] = users.get(i).getDescargas().toString();
        }
        return new DefaultTableModel(data,columnNames);
 

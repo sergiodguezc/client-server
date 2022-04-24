@@ -1,19 +1,22 @@
 package client;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import msg.*;
+import server.User;
 
 public class ServerListener extends Thread {
     private FileMonitor name_file;
     private Socket socket;
     private ObjectOutputStream fout;
     private ObjectInputStream fin;
+
+    // Vista de la tabla de informacion global obtenida por el Server
+    private ArrayList<User> users;
 
     public ServerListener(Socket socket, ObjectInputStream fin, ObjectOutputStream fout, FileMonitor name_file) {
         this.socket = socket;
@@ -31,6 +34,7 @@ public class ServerListener extends Thread {
                     case CONNECTIONACK:
                     case USERLISTACK:
                         // Mostramos la informacion devuelta por el server
+                        users = msg.getUsers();
                         System.out.println(msg);
                         break;
                     case CLOSEACK:
@@ -55,5 +59,9 @@ public class ServerListener extends Thread {
                 // e.printStackTrace();
             }
         }
+    }
+
+    public ArrayList<User> getUsers() {
+        return users;
     }
 }

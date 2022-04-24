@@ -1,5 +1,7 @@
 package msg;
 
+import server.User;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -36,6 +38,10 @@ public abstract class Message implements Serializable {
     }
 
     public ArrayList<String> getFiles() {
+        return null;
+    }
+
+    public ArrayList<User> getUsers() {
         return null;
     }
 }

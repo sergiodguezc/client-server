@@ -7,7 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.swing.*;
 
@@ -26,6 +25,7 @@ public class Client extends JFrame implements ActionListener {
     private ClientInitPanel panelInicio;
     private ClientMenuPanel panelMenu;
     private ClientDownloadPanel panelDownload;
+    private UserListPanel userListPanel;
     private String ip;
     private String username;
 
@@ -88,6 +88,9 @@ public class Client extends JFrame implements ActionListener {
             } else if (e.getSource() == panelMenu.getButtonUserList()) {
                 fout.writeObject(new UserListMessage(username));
                 fout.flush();
+
+                // TODO: aqui
+
 
             } else if (e.getSource() == panelMenu.getButtonExit()) {
                 fout.writeObject(new CloseMessage(username));
