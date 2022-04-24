@@ -1,8 +1,8 @@
 package client;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -14,6 +14,7 @@ import msg.CloseMessage;
 import msg.ConnectionMessage;
 import msg.FileRequestMessage;
 import msg.UserListMessage;
+import server.User;
 
 public class Client extends JFrame implements ActionListener {
     private Socket socket;
@@ -67,7 +68,7 @@ public class Client extends JFrame implements ActionListener {
                 fin = new ObjectInputStream(socket.getInputStream());
 
                 // Creamos un proceso que reciba los mensajes del servidor
-                OS = new ServerListener(socket, fin, fout, name_files);
+                OS = new ServerListener(socket, fin, fout, name_files, this);
                 OS.start();
 
                 // Convertimos los (String -> File) -> String[] para
@@ -88,9 +89,6 @@ public class Client extends JFrame implements ActionListener {
             } else if (e.getSource() == panelMenu.getButtonUserList()) {
                 fout.writeObject(new UserListMessage(username));
                 fout.flush();
-
-                // TODO: aqui
-
 
             } else if (e.getSource() == panelMenu.getButtonExit()) {
                 fout.writeObject(new CloseMessage(username));
@@ -116,9 +114,17 @@ public class Client extends JFrame implements ActionListener {
             } else if (e.getSource() == panelInicio.getAddFilesButton()) {
                 int retval = panelInicio.openDialog();
                 if (retval == JFileChooser.APPROVE_OPTION) {
-                    File f = panelInicio.getSelectedFile();
-                    name_files.put(f.getName(),f);
+                    File[] files = panelInicio.getSelectedFiles();
+                    for (File f : files) {
+                        name_files.put(f.getName(),f);
+                        panelInicio.addTextArea(f);
+                    }
                 }
+            } else if (e.getSource() == userListPanel.getMenuButton()) {
+                remove(userListPanel);
+                add(panelMenu);
+                revalidate();
+                repaint();
             }
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -126,9 +132,9 @@ public class Client extends JFrame implements ActionListener {
     }
 
     private void iniciarPanel() {
-        setBounds(20, 20, 400, 300);
-        setResizable(false);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setBounds(20, 20, 400, 500);
+        setResizable(true);
+        setCloseWindow();
 
         // Panel inicial
         panelInicio = new ClientInitPanel(this);
@@ -143,5 +149,32 @@ public class Client extends JFrame implements ActionListener {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private void setCloseWindow() {
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                try {
+                    if(fout != null) {
+                        fout.writeObject(new CloseMessage(username));
+                        fout.flush();
+                        OS.join();
+                    }
+                    System.exit(0);
+                } catch (IOException ex) {
+                    // throw new RuntimeException(ex);
+                } catch (InterruptedException ex) {
+                    //throw new RuntimeException(ex);
+                }
+            }
+        });
+    }
+
+    public void showUserList(ArrayList<User> users) {
+        remove(panelMenu);
+        userListPanel = new UserListPanel(this,users);
+        add(userListPanel);
+        revalidate();
+        repaint();
     }
 }

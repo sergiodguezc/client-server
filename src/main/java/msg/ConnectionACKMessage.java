@@ -11,6 +11,6 @@ public class ConnectionACKMessage extends Message {
 	}
 
 	public String toString() {
-		return "ConnectionACKMessage{" + getSrc() + "," + getDest() + "}";
+		return "Connection made successfully";
 	}
 }

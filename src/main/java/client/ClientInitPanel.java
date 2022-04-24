@@ -8,10 +8,12 @@ import java.io.File;
 import javax.swing.*;
 
 public class ClientInitPanel extends JPanel {
-    private JTextField textIp = new JTextField(20);
+    private JTextField textIp = new JTextField("localhost", 20);
     private JTextField textUsername = new JTextField(20);
     private JLabel labelUsername = new JLabel("Enter username: ");
     private JLabel labelIp = new JLabel("Enter ip: ");
+    private JLabel textTitleFiles = new JLabel("Archivos seleccionados");
+    private JTextArea textArea = new JTextArea();
     private JButton okButton = new JButton("OK");
 
     private JButton addFilesButton = new JButton("Add Files");
@@ -24,6 +26,7 @@ public class ClientInitPanel extends JPanel {
 
         // Init filechooser
         fileChooser = new JFileChooser();
+        fileChooser.setMultiSelectionEnabled(true);
 
         constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.WEST;
@@ -53,6 +56,19 @@ public class ClientInitPanel extends JPanel {
 
         constraints.gridx = 0;
         constraints.gridy = 3;
+        constraints.gridwidth = 2;
+        constraints.anchor = GridBagConstraints.CENTER;
+        this.add(textTitleFiles, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 4;
+        constraints.gridwidth = 2;
+        constraints.anchor = GridBagConstraints.CENTER;
+        this.add(textArea,constraints);
+
+
+        constraints.gridx = 0;
+        constraints.gridy = 5;
         constraints.gridwidth = 2;
         constraints.anchor = GridBagConstraints.CENTER;
         okButton.addActionListener(cliente);
@@ -86,7 +102,8 @@ public class ClientInitPanel extends JPanel {
     public File[] getSelectedFiles(){
         return fileChooser.getSelectedFiles();
     }
-    public File getSelectedFile(){
-        return fileChooser.getSelectedFile();
+
+    public void addTextArea(File f) {
+        textArea.append(f.getName() + "\n");
     }
 }

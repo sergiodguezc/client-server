@@ -50,10 +50,9 @@ public class Receiver extends Thread {
             // Creamos un nuevo fichero a partir del fichero que le manda el sender
             File file = new File(name);
             BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-            if (file.createNewFile()){
-                String line;
-                while((line = fin_p2p.readLine()) != null)
-                    bw.write(line);
+            String line;
+            while((line = fin_p2p.readLine()) != null) {
+                bw.write(line + '\n');
             }
             bw.close();
 

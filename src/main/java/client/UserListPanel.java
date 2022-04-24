@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 public class UserListPanel extends JPanel {
    JTable table;
+   JScrollPane scrollPane;
    JButton menuButton = new JButton("Menu");
 
     private GridBagConstraints constraints;
@@ -16,27 +17,29 @@ public class UserListPanel extends JPanel {
    public UserListPanel(Client cliente, ArrayList<User> users) {
        super(new GridBagLayout());
 
-       constraints = new GridBagConstraints();
-       constraints.anchor = GridBagConstraints.WEST;
-       constraints.insets = new Insets(10, 10, 10, 10);
+       //constraints = new GridBagConstraints();
+       //constraints.anchor = GridBagConstraints.WEST;
+       //constraints.insets = new Insets(10, 10, 10, 10);
 
        table = new JTable(createTableModel(users));
+       scrollPane = new JScrollPane(table);
+       table.setFillsViewportHeight(true);
 
        // add components to the panel
-       constraints.gridx = 0;
-       constraints.gridy = 0;
-       this.add(table, constraints);
+       //constraints.gridx = 0;
+       //constraints.gridy = 0;
+       this.add(scrollPane);
 
-       constraints.gridx = 3;
-       constraints.gridy = 3;
-       constraints.gridwidth = 2;
-       constraints.anchor = GridBagConstraints.CENTER;
+       //constraints.gridx = 3;
+       //constraints.gridy = 3;
+       //constraints.gridwidth = 2;
+       //constraints.anchor = GridBagConstraints.CENTER;
        menuButton.addActionListener(cliente);
-       this.add(menuButton, constraints);
+       this.add(menuButton);
 
+       //setVisible(true);
        // set border for the panel
-       this.setBorder(BorderFactory.createTitledBorder(
-               BorderFactory.createEtchedBorder(), "User list"));
+       // this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "User list"));
    }
 
     private DefaultTableModel createTableModel(ArrayList<User> users) {
@@ -49,5 +52,9 @@ public class UserListPanel extends JPanel {
        }
        return new DefaultTableModel(data,columnNames);
 
+    }
+
+    public JButton getMenuButton() {
+       return menuButton;
     }
 }

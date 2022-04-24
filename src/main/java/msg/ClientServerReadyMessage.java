@@ -8,6 +8,7 @@ public class ClientServerReadyMessage extends Message {
 	public ClientServerReadyMessage(String src, String receiver, int port) {
 		super(src, "server");
 		this.receiver = receiver;
+		this.port = port;
 	}
 
 	public KindM getType() {

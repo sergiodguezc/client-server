@@ -11,6 +11,6 @@ public class CloseACKMessage extends Message {
 	}
 
 	public String toString() {
-		return "CloseACKMessage{" + getSrc() + "," + getDest() + "}";
+		return "Closing connection...";
 	}
 }

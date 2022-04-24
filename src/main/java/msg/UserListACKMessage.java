@@ -19,10 +19,6 @@ public class UserListACKMessage extends Message {
 		return KindM.USERLISTACK;
 	}
 
-	public String toString() {
-		return "UserListACK{" + id_user.toString() + "}";
-	}
-
 	public ArrayList<User> getUsers() {
 		ArrayList<User> users = new ArrayList<>();
 		for (String u : id_user.keySet()) {
