@@ -18,7 +18,6 @@ public class ClientInitPanel extends JPanel {
     private JFileChooser fileChooser = new JFileChooser();
 
 	private GridBagConstraints constraints;
-    private Client cliente;
 
     public ClientInitPanel(Client cliente) {
         super(new GridBagLayout());

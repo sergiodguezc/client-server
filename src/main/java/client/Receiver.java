@@ -2,10 +2,7 @@ package client;
 
 import msg.FileReceivedMessage;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.HashMap;
 
@@ -23,8 +20,8 @@ public class Receiver extends Thread {
     private ObjectInputStream fin_server;
 
     // Canales de comunicacion p2p
-    private ObjectOutputStream fout_p2p;
-    private ObjectInputStream fin_p2p;
+    private PrintWriter fout_p2p;
+    private BufferedReader fin_p2p;
 
     // Nombre del receptor
     private String username;
@@ -32,8 +29,8 @@ public class Receiver extends Thread {
     public Receiver(String username, ObjectOutputStream fout_server, ObjectInputStream fin_server, FileMonitor name_file, int port_sender) {
         try {
             socket = new Socket("localhost",port_sender);
-            fout_p2p = new ObjectOutputStream(socket.getOutputStream());
-            fin_p2p = new ObjectInputStream(socket.getInputStream());
+            fout_p2p = new PrintWriter(socket.getOutputStream());
+            fin_p2p = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.fout_server = fout_server;
             this.fin_server = fin_server;
             this.name_file = name_file;
@@ -47,9 +44,20 @@ public class Receiver extends Thread {
     public void run() {
         // Espera a recibir el fichero
         try {
-            // TODO: Testear si el archivo se guarda en memoria
-            File file = (File) fin_p2p.readObject();
-            String name = file.getName();
+            // Recibimos el nombre del fichero solicitado
+            String name = fin_p2p.readLine();
+
+            // Creamos un nuevo fichero a partir del fichero que le manda el sender
+            File file = new File(name);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+            if (file.createNewFile()){
+                String line;
+                while((line = fin_p2p.readLine()) != null)
+                    bw.write(line);
+            }
+            bw.close();
+
+            // Modificamos la tabla del cliente con este nuevo fichero
             name_file.put(name, file);
 
             // Confirmamos al servidor que la comunicacion p2p se ha realizado exitosamente
@@ -63,8 +71,6 @@ public class Receiver extends Thread {
             socket.close();
 
         } catch (IOException e) {
-            // throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             // throw new RuntimeException(e);
         }
     }

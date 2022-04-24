@@ -51,8 +51,16 @@ public class Sender extends Thread {
             fout_p2p = new PrintWriter(socket.getOutputStream());
             fin_p2p = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            // Cuando el receptor está conectado le pasamos la información
-            BufferedReader input = new BufferedReader(fichero)
+            // Cuando el receptor está conectado le pasamos primero el nombre del fichero
+            fout_p2p.println(fichero.getName());
+            fout_p2p.flush();
+
+            // y luego el fichero linea por linea
+            BufferedReader input = new BufferedReader(new FileReader(fichero));
+            String line;
+            while((line =  input.readLine()) != null)
+                fout_p2p.println(line);
+            input.close();
 
             // Terminamos la conexion p2p
             fout_p2p.close();

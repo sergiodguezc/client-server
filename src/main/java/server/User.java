@@ -31,6 +31,8 @@ public class User implements Cloneable, Serializable {
         this.descargas = new HashSet<>();
     }
 
+    public String getIp() {return ip;}
+
 	public String getUsername() {
 		return username;
 	}
