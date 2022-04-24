@@ -10,12 +10,12 @@ import java.util.HashMap;
 import msg.*;
 
 public class ServerListener extends Thread {
-    private HashMap<String, File> name_file;
+    private FileMonitor name_file;
     private Socket socket;
     private ObjectOutputStream fout;
     private ObjectInputStream fin;
 
-    public ServerListener(Socket socket, ObjectInputStream fin, ObjectOutputStream fout, HashMap<String, File> name_file) {
+    public ServerListener(Socket socket, ObjectInputStream fin, ObjectOutputStream fout, FileMonitor name_file) {
         this.socket = socket;
         this.fin = fin;
         this.fout = fout;

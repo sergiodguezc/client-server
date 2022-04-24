@@ -13,7 +13,7 @@ import java.util.HashMap;
 public class Receiver extends Thread {
     // Tabla del cliente con los ficheros para modificar
     // que tiene un nuevo fichero descargado
-    private HashMap<String, File> name_file;
+    private FileMonitor name_file;
 
     // Socket para la comunicacion p2p
     private Socket socket;
@@ -29,7 +29,7 @@ public class Receiver extends Thread {
     // Nombre del receptor
     private String username;
 
-    public Receiver(String username, ObjectOutputStream fout_server, ObjectInputStream fin_server, HashMap<String, File> name_file, int port_sender) {
+    public Receiver(String username, ObjectOutputStream fout_server, ObjectInputStream fin_server, FileMonitor name_file, int port_sender) {
         try {
             socket = new Socket("localhost",port_sender);
             fout_p2p = new ObjectOutputStream(socket.getOutputStream());

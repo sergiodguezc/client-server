@@ -2,10 +2,7 @@ package client;
 
 import msg.ClientServerReadyMessage;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -20,8 +17,8 @@ public class Sender extends Thread {
     private ObjectInputStream fin_server;
 
     // Canales de comunicacion p2p
-    private ObjectOutputStream fout_p2p;
-    private ObjectInputStream fin_p2p;
+    private PrintWriter fout_p2p;
+    private BufferedReader fin_p2p;
 
     // Nombre del receptor
     private String receiver;
@@ -49,14 +46,13 @@ public class Sender extends Thread {
             fout_server.writeObject(new ClientServerReadyMessage(sender, receiver, ss.getLocalPort()));
             fout_server.flush();
 
-            // Esperamos a que se conecte el receptor
+            // Esperamos a que se conecte el receptor y creamos los canales
             socket = ss.accept();
-            fout_p2p = new ObjectOutputStream(socket.getOutputStream());
-            fin_p2p = new ObjectInputStream(socket.getInputStream());
+            fout_p2p = new PrintWriter(socket.getOutputStream());
+            fin_p2p = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             // Cuando el receptor está conectado le pasamos la información
-            fout_p2p.writeObject(fichero);
-            fout_p2p.flush();
+            BufferedReader input = new BufferedReader(fichero)
 
             // Terminamos la conexion p2p
             fout_p2p.close();

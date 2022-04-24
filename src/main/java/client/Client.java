@@ -32,12 +32,12 @@ public class Client extends JFrame implements ActionListener {
     // Tabla para obtener el fichero solicitado por otro cliente
     // Clave : Nombre que el servidor tiene asociado a este fichero
     // Valor : File que tiene descargado el cliente con ese nombre
-    private HashMap<String,File> name_files;
+    private FileMonitor name_files;
 
 
     public Client() {
         super("Client app");
-        name_files = new HashMap<>();
+        name_files = new FileMonitor();
         iniciarPanel();
     }
 
@@ -69,8 +69,12 @@ public class Client extends JFrame implements ActionListener {
                 // Creamos un proceso que reciba los mensajes del servidor
                 OS = new ServerListener(socket, fin, fout, name_files);
                 OS.start();
+
+                // Convertimos los (String -> File) -> String[] para
+                // notificar al servidor que archivos tiene el usuario nuevo
+                // Notese que no es necesario concurrencia ya que
                 ArrayList<String> filenames = new ArrayList<>();
-                for (String name : name_files.keySet())
+                for (String name : name_files.keyList())
                     filenames.add(name);
                 fout.writeObject(new ConnectionMessage(username, "server", filenames));
                 fout.flush();
