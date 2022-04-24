@@ -32,10 +32,11 @@ public class ClientListener extends Thread {
         while(true) {
             try {
                 Message msg = (Message) fin.readObject();
+                User u;
 
                 switch (msg.getType()) {
                     case CONNECTION:
-                        User u = new User(socket.getLocalAddress().getHostAddress(), msg.getSrc(), fout, fin);
+                        u = new User(socket.getLocalAddress().getHostAddress(), msg.getSrc(), fout, fin);
 
                         // Guardamos los nuevos ficheros que tiene este usuario en id_lista
                         for(String file : msg.getFiles()) {
@@ -46,18 +47,22 @@ public class ClientListener extends Thread {
                         // Guarda informacion del usuario en la tabla id_user
                         id_user.add(u);
                         // Envio mensaje-confirmacion-conexion por fout
+                        u.lock();
                         fout.writeObject(new ConnectionACKMessage(msg.getSrc()));
                         fout.flush();
+                        u.unlock();
                         break;
                     case USERLIST:
                         // Crea un mensaje con la informacion global
                         HashMap<String, User> copia_id_user = id_user.getAll();
                         // Envio mensaje confirmacion lista usuarios
+                        u = id_user.get(msg.getSrc());
+                        u.lock();
                         fout.writeObject(new UserListACKMessage(msg.getSrc(), copia_id_user));
                         fout.flush();
+                        u.unlock();
                         break;
                     case CLOSE:
-                        // TODO: Comprobar que esta correcto
                         // Eliminar informacion de las tablas
                         User to_delete = id_user.get(msg.getSrc());
                         // Modificamos las entradas de id_lista donde
@@ -68,12 +73,15 @@ public class ClientListener extends Thread {
                         id_user.delete(msg.getSrc());
 
                         // Envio mensaje confirmacion cerrar conexion
+                        to_delete.lock();
                         fout.writeObject(new CloseACKMessage(msg.getSrc()));
                         fout.flush();
 
                         // Terminamos el proceso
                         fout.close();
+                        to_delete.unlock();
                         fin.close();
+
                         socket.close();
                         return;
                     case FILEREQUEST:
@@ -85,8 +93,12 @@ public class ClientListener extends Thread {
 
                         // Enviar mensaje emitir fichero por fout2
                         // El receptor de la comunicacion es el msg.getSrc()
+
+
+                        sender.lock();
                         fout2.writeObject(new SendFileMessage(name_sender, msg.getSrc(), msg.getFile()));
                         fout2.flush();
+                        sender.unlock();
                         break;
                     case CLIENTSERVERREADY:
                         // Buscar el fout1 del cliente 1 que pidio el fichero
@@ -95,8 +107,10 @@ public class ClientListener extends Thread {
                         ObjectOutputStream fout1 = receiver.getFout();
 
                         // Envio de mensaje preparado de servidor-cliente.
+                        receiver.lock();
                         int port_sender = msg.getPort();
                         fout1.writeObject(new ServerClientReadyMessage(name_receiver,port_sender));
+                        receiver.unlock();
                         break;
                     case FILERECEIVED:
                         // Modificar la tabla id_lista, añadiendo al receptor como

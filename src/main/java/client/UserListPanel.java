@@ -12,34 +12,17 @@ public class UserListPanel extends JPanel {
    JScrollPane scrollPane;
    JButton menuButton = new JButton("Menu");
 
-    private GridBagConstraints constraints;
-
    public UserListPanel(Client cliente, ArrayList<User> users) {
        super(new GridBagLayout());
-
-       //constraints = new GridBagConstraints();
-       //constraints.anchor = GridBagConstraints.WEST;
-       //constraints.insets = new Insets(10, 10, 10, 10);
 
        table = new JTable(createTableModel(users));
        scrollPane = new JScrollPane(table);
        table.setFillsViewportHeight(true);
 
-       // add components to the panel
-       //constraints.gridx = 0;
-       //constraints.gridy = 0;
        this.add(scrollPane);
 
-       //constraints.gridx = 3;
-       //constraints.gridy = 3;
-       //constraints.gridwidth = 2;
-       //constraints.anchor = GridBagConstraints.CENTER;
        menuButton.addActionListener(cliente);
        this.add(menuButton);
-
-       //setVisible(true);
-       // set border for the panel
-       // this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "User list"));
    }
 
     private DefaultTableModel createTableModel(ArrayList<User> users) {

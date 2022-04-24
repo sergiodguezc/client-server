@@ -5,6 +5,7 @@ import msg.ClientServerReadyMessage;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.locks.Lock;
 
 // Sender hace la funcion de cliente en la conexion p2p
 public class Sender extends Thread {
@@ -29,12 +30,16 @@ public class Sender extends Thread {
     // Fichero que envía
     private File fichero;
 
-    public Sender(ObjectOutputStream fout_server, ObjectInputStream fin_server, String sender, String receiver, File file) {
+    // Lock para que la escritura del fout_server sea atomica
+    private Lock lock_fout;
+
+    public Sender(ObjectOutputStream fout_server, ObjectInputStream fin_server, String sender, String receiver, File file, Lock lock_fout) {
         this.fout_server = fout_server;
         this.fin_server = fin_server;
         this.sender = sender;
         this.receiver = receiver;
         this.fichero = file;
+        this.lock_fout = lock_fout;
     }
 
     public void run() {
@@ -43,8 +48,10 @@ public class Sender extends Thread {
             ss = new ServerSocket(0);
 
             // Enviamos el mensaje al servidor de que esta preparado
+            lock_fout.lock();
             fout_server.writeObject(new ClientServerReadyMessage(sender, receiver, ss.getLocalPort()));
             fout_server.flush();
+            lock_fout.unlock();
 
             // Esperamos a que se conecte el receptor y creamos los canales
             socket = ss.accept();

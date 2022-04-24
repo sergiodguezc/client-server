@@ -1,0 +1,36 @@
+
+          $$\ $$\                      $$\
+          $$ |\__|                     $$ |
+ $$$$$$$\ $$ |$$\  $$$$$$\  $$$$$$$\ $$$$$$\          $$$$$$$\  $$$$$$\   $$$$$$\ $$\    $$\  $$$$$$\   $$$$$$\
+$$  _____|$$ |$$ |$$  __$$\ $$  __$$\\_$$  _|$$$$$$\ $$  _____|$$  __$$\ $$  __$$\\$$\  $$  |$$  __$$\ $$  __$$\
+$$ /      $$ |$$ |$$$$$$$$ |$$ |  $$ | $$ |  \______|\$$$$$$\  $$$$$$$$ |$$ |  \__|\$$\$$  / $$$$$$$$ |$$ |  \__|
+$$ |      $$ |$$ |$$   ____|$$ |  $$ | $$ |$$\        \____$$\ $$   ____|$$ |       \$$$  /  $$   ____|$$ |
+\$$$$$$$\ $$ |$$ |\$$$$$$$\ $$ |  $$ | \$$$$  |      $$$$$$$  |\$$$$$$$\ $$ |        \$  /   \$$$$$$$\ $$ |
+ \_______|\__|\__| \_______|\__|  \__|  \____/       \_______/  \_______|\__|         \_/     \_______|\__|
+                                                por
+                            Enrique Carro Garrido y Sergio Domínguez Cabrera
+                                             2021-2022
+
+- Descripción general del proyecto
+Este proyecto contiene una aplicación cliente servidor. Para ejecutarlo, simplemente ejecutar primero
+server.Server.java y seguidamente tantos client.Client.java como queramos. La interacción con el servidor
+se realiza a través de la interfaz de usuario del cliente. Puede ser que en algún momento la interfaz se
+vea mal, esto tiene que ver con el reescalado de algunos componentes, con redimensionar la ventana deberían
+solventarse. Las descargas de archivos se colocan en el path desde el que se esté ejecutando
+la aplicación del cliente que solicita los archivos.
+
+- Concurrencia
+Empleamos concurrencia en varios momentos y de diversas formas.
+    + Monitor 'DataMonitor' que encapsula las lecturas y escrituras en la tabla del servidor que almacena
+    la información disponible en el sistema. Implementamos este monitor mediante un Lock y variables de
+    condición.
+    + La clase 'UserTable', que resuelve el problema de lectores-escritores en la tabla del servidor que
+    almacena los datos referidos a los usuarios conectados en el sistema. Se resuelve mediante el uso de
+    semáforos.
+    + Empleamos Locks para los accesos a los ObjectOutputStream, debido a que en nuestra implementación
+    puede ocurrir que dos procesos distintos del servidor intenten acceder a un mismo ObjectOutputStream.
+    Del mismo modo, empleamos Locks para los ObjectOutputStream, pero esta vez en los clientes, debido a
+    que también varios procesos del cliente podrían acceder al mismo recurso de manera concurrente.
+    + Empleamos Locks implementados en la práctica dos para bloquear la GUI cuando esta recibiendo nuevos
+    mensajes del servidor.
+

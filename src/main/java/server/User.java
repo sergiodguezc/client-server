@@ -5,12 +5,19 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class User implements Cloneable, Serializable {
 
     private final String ip;
     private final String username;
     private final ObjectInputStream fin;
+
+    // Para proteger el canal fout, que se accede desde otros ClientListener
+    // Cuando hay una comunicacion p2p, utilizamos un Lock
+    private Lock lock;
+
     private final ObjectOutputStream fout;
     private Set<String> descargas;
     
@@ -20,6 +27,8 @@ public class User implements Cloneable, Serializable {
         this.fin = fin;
         this.fout = fout;
         this.descargas = new HashSet<>();
+        // Iniciamos el lock
+        lock = new ReentrantLock(true);
     }
 
     // Constructor para la copia de la tabla id_user, necesitamos objetos serializables
@@ -69,5 +78,13 @@ public class User implements Cloneable, Serializable {
 
     public ObjectOutputStream getFout() {
         return fout;
+    }
+
+    public void lock() {
+        lock.lock();
+    }
+
+    public void unlock() {
+        lock.unlock();
     }
 }

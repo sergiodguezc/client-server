@@ -8,7 +8,7 @@ import lock.LockBakery;
 
 import javax.swing.JFrame;
 
-public class Server extends JFrame {
+public class Server  {
     // Necesitamos dos tablas que almacenan la informacion del
     // sistema que se accederan de manera concurrente mediante
     // el problema de lector-escritor.

@@ -5,6 +5,7 @@ import msg.FileReceivedMessage;
 import java.io.*;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.concurrent.locks.Lock;
 
 // Receiver hace la funcion de server en la conexion p2p
 public class Receiver extends Thread {
@@ -26,7 +27,10 @@ public class Receiver extends Thread {
     // Nombre del receptor
     private String username;
 
-    public Receiver(String username, ObjectOutputStream fout_server, ObjectInputStream fin_server, FileMonitor name_file, int port_sender) {
+    // Locks para que la escritura de los mensajes sean atomicos
+    private Lock lock_fout;
+
+    public Receiver(String username, ObjectOutputStream fout_server, ObjectInputStream fin_server, FileMonitor name_file, int port_sender, Lock lock_fout) {
         try {
             socket = new Socket("localhost",port_sender);
             fout_p2p = new PrintWriter(socket.getOutputStream());
@@ -35,6 +39,7 @@ public class Receiver extends Thread {
             this.fin_server = fin_server;
             this.name_file = name_file;
             this.username = username;
+            this.lock_fout = lock_fout;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,8 +66,10 @@ public class Receiver extends Thread {
 
             // Confirmamos al servidor que la comunicacion p2p se ha realizado exitosamente
             // Para que el servidor modifique la informacion global.
+            lock_fout.lock();
             fout_server.writeObject(new FileReceivedMessage(username, name));
             fout_server.flush();
+            lock_fout.unlock();
 
             // Terminamos la conexion p2p
             fout_p2p.close();

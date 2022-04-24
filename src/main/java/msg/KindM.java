@@ -6,7 +6,6 @@ public enum KindM {
     USERLIST,
     USERLISTACK,
     SENDFILE,
-    SENDFILEACK,
     FILEREQUEST,
     FILEREQUESTACK,
     CLIENTSERVERREADY,
@@ -14,5 +13,4 @@ public enum KindM {
     CLOSE,
     CLOSEACK,
     FILERECEIVED,
-    FILERECEIVEDACK;
 }

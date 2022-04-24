@@ -7,13 +7,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.*;
 
-import msg.CloseMessage;
-import msg.ConnectionMessage;
-import msg.FileRequestMessage;
-import msg.UserListMessage;
+import lock.LockBakery;
+import msg.*;
 import server.User;
 
 public class Client extends JFrame implements ActionListener {
@@ -27,6 +27,7 @@ public class Client extends JFrame implements ActionListener {
     private ClientMenuPanel panelMenu;
     private ClientDownloadPanel panelDownload;
     private UserListPanel userListPanel;
+    private CloseACKPanel closeACKPanel;
     private String ip;
     private String username;
 
@@ -35,11 +36,20 @@ public class Client extends JFrame implements ActionListener {
     // Valor : File que tiene descargado el cliente con ese nombre
     private FileMonitor name_files;
 
+    // Utilizamos el LockBakery implementado en la practica 2 para
+    // bloquear la interfaz y asi no reciba nuevos comandos del usuario hasta que
+    // no reciba el ACK del servidor
+    private LockBakery lockGUI;
+
+    // Lock para que la escritura sobre el canal sea atomica
+    private Lock lock_fout;
 
     public Client() {
         super("Client app");
         name_files = new FileMonitor();
         iniciarPanel();
+        lockGUI = new LockBakery(2);
+        lock_fout = new ReentrantLock(true);
     }
 
 
@@ -61,15 +71,17 @@ public class Client extends JFrame implements ActionListener {
             if (e.getSource() == panelInicio.getOkButton()) {
                 ip = panelInicio.getTextIp().getText();
                 username = panelInicio.getTextUsername().getText();
-                
-                // Si el server no está disponible no furula
+
                 socket = new Socket(ip, 9999);
                 fout = new ObjectOutputStream(socket.getOutputStream());
                 fin = new ObjectInputStream(socket.getInputStream());
 
                 // Creamos un proceso que reciba los mensajes del servidor
-                OS = new ServerListener(socket, fin, fout, name_files, this);
+                OS = new ServerListener(socket, fin, fout, name_files, this, lockGUI, lock_fout);
                 OS.start();
+
+                // Cambiamos el titulo del JFrame para identificarlos
+                this.setTitle(username);
 
                 // Convertimos los (String -> File) -> String[] para
                 // notificar al servidor que archivos tiene el usuario nuevo
@@ -77,6 +89,7 @@ public class Client extends JFrame implements ActionListener {
                 ArrayList<String> filenames = new ArrayList<>();
                 for (String name : name_files.keyList())
                     filenames.add(name);
+
                 fout.writeObject(new ConnectionMessage(username, "server", filenames));
                 fout.flush();
 
@@ -87,30 +100,34 @@ public class Client extends JFrame implements ActionListener {
                 repaint();
 
             } else if (e.getSource() == panelMenu.getButtonUserList()) {
+                lockGUI.takeLock(1);
                 fout.writeObject(new UserListMessage(username));
                 fout.flush();
+                lockGUI.releaseLock(1);
 
             } else if (e.getSource() == panelMenu.getButtonExit()) {
+                lockGUI.takeLock(1);
                 fout.writeObject(new CloseMessage(username));
                 fout.flush();
-                OS.join();
-                System.exit(0);
+                lockGUI.releaseLock(1);
 
             } else if (e.getSource() == panelMenu.getButtonDownload()) {
-                // Cambio de panel
                 remove(panelMenu);
                 add(panelDownload);
                 revalidate();
                 repaint();
+
             } else if(e.getSource() == panelDownload.getButton()) {
                 String file = panelDownload.getTextfilename().getText();
+                lockGUI.takeLock(1);
                 fout.writeObject(new FileRequestMessage(username, file));
                 fout.flush();
-
+                lockGUI.releaseLock(1);
                 remove(panelDownload);
                 add(panelMenu);
                 revalidate();
                 repaint();
+
             } else if (e.getSource() == panelInicio.getAddFilesButton()) {
                 int retval = panelInicio.openDialog();
                 if (retval == JFileChooser.APPROVE_OPTION) {
@@ -120,12 +137,22 @@ public class Client extends JFrame implements ActionListener {
                         panelInicio.addTextArea(f);
                     }
                 }
+
             } else if (e.getSource() == userListPanel.getMenuButton()) {
                 remove(userListPanel);
                 add(panelMenu);
                 revalidate();
                 repaint();
+
+            } else if (e.getSource() == closeACKPanel.getOkButton()) {
+                // Cerramos la conexion
+                fout.close();
+                fin.close();
+                socket.close();
+                OS.join();
+                System.exit(0);
             }
+            //lockGUI.releaseLock(1);
         } catch (Exception exc) {
             exc.printStackTrace();
         }
@@ -145,6 +172,8 @@ public class Client extends JFrame implements ActionListener {
 
         // panel download
         panelDownload = new ClientDownloadPanel(this);
+
+        userListPanel = new UserListPanel(this, new ArrayList<>());
 
         pack();
         setLocationRelativeTo(null);
@@ -174,6 +203,15 @@ public class Client extends JFrame implements ActionListener {
         remove(panelMenu);
         userListPanel = new UserListPanel(this,users);
         add(userListPanel);
+        revalidate();
+        repaint();
+    }
+
+    public void showCloseACK(String msg) {
+        panelMenu.setVisible(false);
+        closeACKPanel = new CloseACKPanel(this,msg);
+        closeACKPanel.setVisible(true);
+        add(closeACKPanel);
         revalidate();
         repaint();
     }
